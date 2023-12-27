@@ -3,6 +3,11 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration
 from langdetect import detect
 from spellchecker import SpellChecker
 
+model_id = "google/flan-t5-base"
+model = T5ForConditionalGeneration.from_pretrained(model_id)
+tokenizer = T5Tokenizer.from_pretrained(model_id)
+tokenizer, model
+
 def detect_language(text):
     try:
         language_code = detect(text)
@@ -10,12 +15,6 @@ def detect_language(text):
     except Exception as e:
         print(f"Error detecting language: {e}")
         return None
-
-def load_translation_model():
-    model_id = "google/flan-t5-base"
-    model = T5ForConditionalGeneration.from_pretrained(model_id)
-    tokenizer = T5Tokenizer.from_pretrained(model_id)
-    return tokenizer, model
 
 def correct_spelling(text):
     spell = SpellChecker()
@@ -27,7 +26,8 @@ def translate_and_correct(input_text):
     detected_language = detect_language(input_text)
 
     if detected_language:
-        translation_tokenizer, translation_model = load_translation_model()
+        translation_tokenizer = tokenizer
+        translation_model = model
         
         # Translate input text
         input_text = f"translate {detected_language} to en: {input_text}"
