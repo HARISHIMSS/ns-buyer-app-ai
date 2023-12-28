@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from helpers.audio import transcribe_audio
-from helpers.search import full_text_search_tfidf, full_text_search_transformer, list_of_available_category, list_of_available_domains, search_by_category, search_by_domain, search_by_gps, search_product_by_gps
+from helpers.search import full_text_search_tfidf, full_text_search_transformer, list_of_available_category, list_of_available_domains, search_by_category, search_by_domain, search_by_gps, search_product_by_gps, search_seller_by_gps
 from fastapi.responses import JSONResponse
 
 from helpers.text import translate_and_correct
@@ -41,6 +41,10 @@ async def searchByCategory(category:str,latitude:str,longitude:str):
 @app.post("/searchProductWithGPS")
 async def searchProductWithGPS(product_name:str,latitude:str,longitude:str):
     results = search_product_by_gps(product_name, latitude, longitude)
+    return {"message":results}
+@app.post("/searchSellerWithGPS")
+async def searchSellerWithGPS(seller_name:str,latitude:str,longitude:str):
+    results = search_seller_by_gps(seller_name, latitude, longitude)
     return {"message":results}
 
 @app.post("/searchByGPS")
