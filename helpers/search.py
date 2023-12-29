@@ -197,4 +197,32 @@ def list_of_available_category():
     available_categories = df["category"].unique().tolist()
     return available_categories
 
+def search_products_on_domain_and_gps(domain, product_name, latitude, longitude):
+     # Step 1: Search for items in the specified domain within a 5 km range
+    domain_results = search_by_domain(domain, latitude, longitude)
 
+    print("Domain Results:", domain_results)  # Debugging line
+
+    if isinstance(domain_results, list):
+        # Step 2: Filter the results based on GPS coordinates within a 5 km range
+        results_within_range = [item for item in domain_results if 'gps' in item and
+                                geodesic((latitude, longitude), tuple(map(float, item['gps'].split(',')))).km <= 5]
+
+        print("Results Within Range:", results_within_range)  # Debugging line
+
+        if results_within_range:
+            # Step 3: Perform a full-text search within the filtered results for the given product name
+            tfidf_vectorizer_product = TfidfVectorizer(stop_words="english")
+            tfidf_matrix_product = tfidf_vectorizer_product.fit_transform([item['product_name'] for item in results_within_range])
+
+            query_vector_product = tfidf_vectorizer_product.transform([product_name])
+            cosine_similarities_product = linear_kernel(query_vector_product, tfidf_matrix_product).flatten()
+            related_indices_product = cosine_similarities_product.argsort()[:-6:-1]
+            results_final = [results_within_range[i] for i in related_indices_product]
+
+            return results_final
+        else:
+            return "No items found within the specified GPS coordinates and 5 km range."
+    else:
+        # Return the message from the search_by_domain function
+        return domain_results
