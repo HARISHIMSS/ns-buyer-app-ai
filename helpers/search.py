@@ -13,39 +13,27 @@ data = getDataFromDB()
 
 flattened_data = []
 for document in data:
-    bap_uri,domain,timestamp = document["_id"].split("_")
-    if "result" in document:
-        data_result = document["result"]
-        if data_result is not None:
-            for document in data_result:
-                if document is not None:
-                    if "bpp/providers" in document:
-                        bpp_providers_document = document["bpp/providers"]
-                        bpp_descritor_document = document["bpp/descriptor"]
-                        bpp_fulfillments_document = document["bpp/fulfillments"]
-                        if (
-                            bpp_providers_document is not None
-                            and bpp_descritor_document is not None
-                            and bpp_fulfillments_document is not None
-                        ):
-                            for provider in bpp_providers_document:
-                                if provider is not None:
-                                    locations_provider = provider["locations"]
-                                    descriptor_provider = provider["descriptor"]
-                                    items_provider = provider["items"]
-                                    for item in items_provider:
-                                        for location in locations_provider:
-                                            flattened_data.append(
-                                                {
-                                                    "product_name": descriptor_provider["name"],
-                                                    "seller_name": bpp_descritor_document["name"],
-                                                    "category": item["category_id"],
-                                                    "bap_uri": bap_uri,
-                                                    "domain": domain,
-                                                    "gps": location["gps"],
-                                                    "document":document
-                                                }
-                                            )
+    bpp_providers_document = document["bpp/providers"]
+    bpp_descritor_document = document["bpp/descriptor"]
+    bpp_fulfillments_document = document["bpp/fulfillments"]
+    descriptor_provider = bpp_providers_document["descriptor"]
+#     locations_provider = bpp_providers_document["locations"]
+    locations_provider = document["locations"]
+    items_provider = bpp_providers_document["items"]
+    product_name = descriptor_provider["name"]
+    seller_name = bpp_descritor_document["name"]
+    category = items_provider["category_id"]
+    domain = document["domain"]
+    gps = locations_provider["gps"]
+    final_document = {
+        "product_name" : product_name,
+        "seller_name" : seller_name,
+        "category" : category,
+        "domain" : domain,
+        "gps" : gps,
+        "document" : document
+    }
+    flattened_data.append(final_document)
 
 # Create a DataFrame for easy manipulation
 df = pd.DataFrame(flattened_data)
@@ -201,19 +189,17 @@ def search_products_on_domain_and_gps(domain, product_name, latitude, longitude)
      # Step 1: Search for items in the specified domain within a 5 km range
     domain_results = search_by_domain(domain, latitude, longitude)
 
-    print("Domain Results:", domain_results)  # Debugging line
-
     if isinstance(domain_results, list):
         # Step 2: Filter the results based on GPS coordinates within a 5 km range
-        results_within_range = [item for item in domain_results if 'gps' in item and
-                                geodesic((latitude, longitude), tuple(map(float, item['gps'].split(',')))).km <= 5]
+        results_within_range = [item for item in domain_results if 'gps' in item["locations"] and
+                                geodesic((latitude, longitude), tuple(map(float, item["locations"]['gps'].split(',')))).km <= 5]
 
         print("Results Within Range:", results_within_range)  # Debugging line
 
         if results_within_range:
             # Step 3: Perform a full-text search within the filtered results for the given product name
             tfidf_vectorizer_product = TfidfVectorizer(stop_words="english")
-            tfidf_matrix_product = tfidf_vectorizer_product.fit_transform([item['product_name'] for item in results_within_range])
+            tfidf_matrix_product = tfidf_vectorizer_product.fit_transform([item["bpp/providers"]["descriptor"]['name'] for item in results_within_range])
 
             query_vector_product = tfidf_vectorizer_product.transform([product_name])
             cosine_similarities_product = linear_kernel(query_vector_product, tfidf_matrix_product).flatten()
