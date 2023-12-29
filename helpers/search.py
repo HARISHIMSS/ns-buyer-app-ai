@@ -212,3 +212,34 @@ def search_products_on_domain_and_gps(domain, product_name, latitude, longitude)
     else:
         # Return the message from the search_by_domain function
         return domain_results
+    
+def search_products_by_domain_category_and_gps(domain, category, product_name, latitude, longitude):
+    # Step 1: Filter by domain
+    domain_results = df[df["domain"] == domain]
+
+    if not domain_results.empty:
+        # Step 2: Filter by category within the domain
+        category_results = domain_results[domain_results["category"] == category]
+
+        if not category_results.empty:
+            # Step 3: Filter the results based on the GPS coordinates within the specified range
+            category_results['gps'] = category_results['gps'].apply(lambda x: tuple(map(float, x.split(','))))
+            results = category_results[category_results.apply(lambda row: geodesic((latitude, longitude), row['gps']).km <= 5, axis=1)]
+
+            if not results.empty:
+                # Step 4: Perform a full-text search within the filtered results for the given product name
+                tfidf_vectorizer_product = TfidfVectorizer(stop_words="english")
+                tfidf_matrix_product = tfidf_vectorizer_product.fit_transform(results["product_name"])
+
+                query_vector_product = tfidf_vectorizer_product.transform([product_name])
+                cosine_similarities_product = linear_kernel(query_vector_product, tfidf_matrix_product).flatten()
+                related_indices_product = cosine_similarities_product.argsort()[:-6:-1]
+                results_final = results.iloc[related_indices_product]
+
+                return results_final["document"].tolist()  # Convert to list for consistent return type
+            else:
+                return "Items are not found for the 5 km range"  # Return a message if no results are found within the specified range
+        else:
+            return f"No items found for the category '{category}' within the domain '{domain}'."
+    else:
+        return f"No items found for the given domain '{domain}' and category '{category}'."
