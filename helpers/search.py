@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from transformers import pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -6,38 +5,9 @@ from sklearn.metrics.pairwise import linear_kernel
 from sklearn.neighbors import NearestNeighbors
 from geopy.distance import geodesic
 
-from helpers.mongo import getDataFromDB
+from helpers.utils.data import getFlattenedDF
 
-# Assume that getDataFromDB returns a list of documents from your MongoDB
-data = getDataFromDB()
-
-flattened_data = []
-for document in data:
-    bpp_providers_document = document["bpp/providers"]
-    bpp_descritor_document = document["bpp/descriptor"]
-    bpp_fulfillments_document = document["bpp/fulfillments"]
-    descriptor_provider = bpp_providers_document["descriptor"]
-#     locations_provider = bpp_providers_document["locations"]
-    locations_provider = document["locations"]
-    items_provider = bpp_providers_document["items"]
-    product_name = descriptor_provider["name"]
-    seller_name = bpp_descritor_document["name"]
-    category = items_provider["category_id"]
-    domain = document["domain"]
-    gps = locations_provider["gps"]
-    final_document = {
-        "product_name" : product_name,
-        "seller_name" : seller_name,
-        "category" : category,
-        "domain" : domain,
-        "gps" : gps,
-        "document" : document
-    }
-    flattened_data.append(final_document)
-
-# Create a DataFrame for easy manipulation
-df = pd.DataFrame(flattened_data)
-
+df = getFlattenedDF()
 # Create an NLP pipeline for extracting embeddings
 nlp = pipeline("feature-extraction",model="distilbert-base-cased")
 
