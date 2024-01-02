@@ -25,19 +25,16 @@ app = FastAPI(
 async def root():
     return {"message":"NS-BUYER-APP-AI server is up and running..."}
 
-@app.get("/searchText/{text}")
-async def searchText(text:str):
-    result = translate_and_correct(text)
-
-    print("User Input:", text)
+@app.post("/searchText")
+async def searchText(text:str,language_code:str = "en"):
+    result = translate_and_correct(text,language_code)
     print("Translated and Corrected Output:", result)
     return {"refined Text":result}
 
 @app.post("/transcribe-audio/")
 async def transcribe_audio_endpoint(audio_file: UploadFile = File(...)):
     transcribed_text = transcribe_audio(audio_file)
-    refined_text = translate_and_correct(transcribed_text)
-    return {"transcribed_text":transcribed_text,"refined Text":refined_text}
+    return {"transcribed_text":transcribed_text}
 
 @app.post("/searchByDomain")
 async def searchByDomain(domain:str,latitude:str,longitude:str):

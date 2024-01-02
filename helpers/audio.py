@@ -25,7 +25,7 @@ def transcribe_audio(audio_file):
         batch_size=16,
         return_timestamps=True,
         torch_dtype=torch_dtype,
-        device=device,
+        device=device
     )
     # Save the uploaded audio file to a temporary file
     with NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
@@ -34,7 +34,7 @@ def transcribe_audio(audio_file):
 
     try:
         # Transcribe audio using the specified model
-        result = pipe(temp_audio_path)
+        result = pipe(temp_audio_path,generate_kwargs={"task":"translate"})
         transcription = result["text"]
         return transcription
     finally:

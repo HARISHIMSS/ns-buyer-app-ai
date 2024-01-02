@@ -35,7 +35,7 @@ def initialize_spacy():
 
 # Function to process user query
 def process_query(text):
-    # text = translate_and_correct(text)
+    text = translate_and_correct(text)
     doc = nnlp(text.lower())
     matches = matcher(doc)
     entities = list(doc.ents)

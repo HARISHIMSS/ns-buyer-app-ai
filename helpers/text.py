@@ -10,14 +10,6 @@ tokenizer = T5Tokenizer.from_pretrained(model_id)
 tokenizer, model
 
 
-def detect_language(text):
-    try:
-        language_code = detect(text)
-        return language_code
-    except Exception as e:
-        print(f"Error detecting language: {e}")
-        return None
-
 def correct_spelling(text):
     spell = SpellChecker()
     corrected_tokens = [spell.correction(token) for token in text.split()]
@@ -28,8 +20,7 @@ def correct_spelling(text):
     else:
         return text
 
-def translate_and_correct(input_text):
-    detected_language = detect_language(input_text)
+def translate_and_correct(input_text:str,detected_language:str="en"):
 
     if detected_language:
         translation_tokenizer = tokenizer
