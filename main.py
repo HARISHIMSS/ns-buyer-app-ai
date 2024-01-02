@@ -2,14 +2,25 @@ from fastapi import FastAPI, File, UploadFile
 from helpers.audio import transcribe_audio
 from helpers.search import full_text_search_tfidf, full_text_search_transformer, list_of_available_category, list_of_available_domains, search_by_category, search_by_domain, search_by_gps, search_product_by_gps, search_products_by_domain_category_and_gps, search_products_on_domain_and_gps, search_seller_by_gps
 from fastapi.responses import JSONResponse
+from helpers.spacy.helpers import search_spacy
+from helpers.spacy.util import initialize_spacy
+from contextlib import asynccontextmanager
 
 from helpers.text import translate_and_correct
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    initialize_spacy()
+    yield
 
 app = FastAPI(
     title="Buyer App AI APIs",
     summary="Buyer app AI APIs",
-    version="0.0.1"
+    version="0.0.1",
+    lifespan=lifespan
 )
+
+
 @app.get("/")
 async def root():
     return {"message":"NS-BUYER-APP-AI server is up and running..."}
@@ -79,4 +90,8 @@ async def searchProductsOnDomainAndGPS(domain:str,product_name:str,latitude:str,
 @app.post("/searchProductsOnDomainAndCategoryAndGPS")
 async def searchProductsOnDomainAndCategoryAndGPS(domain:str,category:str,product_name:str,latitude:str,longitude:str):
     results = search_products_by_domain_category_and_gps(domain,category,product_name,latitude,longitude)
+    return {"message":results}
+@app.get("/searchSpacy/{text}")
+async def searchSpacy(text:str):
+    results = search_spacy(text)
     return {"message":results}

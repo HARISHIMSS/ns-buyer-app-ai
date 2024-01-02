@@ -1,5 +1,6 @@
 import torch
 from transformers import T5Tokenizer, T5ForConditionalGeneration
+# from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, Seq2SeqTrainer, Seq2SeqTrainingArguments
 from langdetect import detect
 from spellchecker import SpellChecker
 
@@ -7,6 +8,7 @@ model_id = "google/flan-t5-base"
 model = T5ForConditionalGeneration.from_pretrained(model_id)
 tokenizer = T5Tokenizer.from_pretrained(model_id)
 tokenizer, model
+
 
 def detect_language(text):
     try:
@@ -19,8 +21,12 @@ def detect_language(text):
 def correct_spelling(text):
     spell = SpellChecker()
     corrected_tokens = [spell.correction(token) for token in text.split()]
-    corrected_text = ' '.join(corrected_tokens)
-    return corrected_text
+    print("corrected_tokens",corrected_tokens)
+    if(corrected_tokens):
+        corrected_text = ' '.join(corrected_tokens)
+        return corrected_text
+    else:
+        return text
 
 def translate_and_correct(input_text):
     detected_language = detect_language(input_text)
