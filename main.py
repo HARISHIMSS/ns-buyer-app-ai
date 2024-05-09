@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from helpers.audio import transcribe_audio
-from helpers.search import full_text_search_tfidf, full_text_search_transformer, list_of_available_category, list_of_available_domains, search_by_category, search_by_domain, search_by_gps, search_product_by_gps, search_products_by_domain_category_and_gps, search_products_on_domain_and_gps, search_seller_by_gps
+from helpers.search import full_text_search_transformer,search_by_gps, search_product_by_gps, search_seller_by_gps
 from fastapi.responses import JSONResponse
 from helpers.spacy.helpers import search_spacy
 from helpers.spacy.util import initialize_spacy
@@ -25,26 +25,26 @@ app = FastAPI(
 async def root():
     return {"message":"NS-BUYER-APP-AI server is up and running..."}
 
-@app.post("/searchText")
-async def searchText(text:str,language_code:str = "en"):
-    result = translate_and_correct(text,language_code)
-    print("Translated and Corrected Output:", result)
-    return {"refined Text":result}
+# @app.post("/searchText")
+# async def searchText(text:str,language_code:str = "en"):
+#     result = translate_and_correct(text,language_code)
+#     print("Translated and Corrected Output:", result)
+#     return {"refined Text":result}
 
 @app.post("/transcribe-audio/")
 async def transcribe_audio_endpoint(audio_file: UploadFile = File(...)):
     transcribed_text = transcribe_audio(audio_file)
     return {"transcribed_text":transcribed_text}
 
-@app.post("/searchByDomain")
-async def searchByDomain(domain:str,latitude:str,longitude:str):
-    results = search_by_domain(domain,latitude,longitude)
-    return {"message":results}
+# @app.post("/searchByDomain")
+# async def searchByDomain(domain:str,latitude:str,longitude:str):
+#     results = search_by_domain(domain,latitude,longitude)
+#     return {"message":results}
 
-@app.post("/searchByCategory")
-async def searchByCategory(category:str,latitude:str,longitude:str):
-    results = search_by_category(category,latitude,longitude)
-    return {"message":results}
+# @app.post("/searchByCategory")
+# async def searchByCategory(category:str,latitude:str,longitude:str):
+#     results = search_by_category(category,latitude,longitude)
+#     return {"message":results}
 
 @app.post("/searchProductWithGPS")
 async def searchProductWithGPS(product_name:str,latitude:str,longitude:str):
@@ -60,35 +60,35 @@ async def searchByGPS(latitude:str,longitude:str):
     results = search_by_gps(latitude, longitude)
     return {"message":results}
 
-@app.get("/searchInTFIDF/{text}")
-async def searchInTFIDF(text:str):
-    results = full_text_search_tfidf(text)
-    return {"message":results}
+# @app.get("/searchInTFIDF/{text}")
+# async def searchInTFIDF(text:str):
+#     results = full_text_search_tfidf(text)
+#     return {"message":results}
 
 @app.get("/searchInTransformer/{text}")
 async def search(text:str):
     results = full_text_search_transformer(text)
     return {"message":results}
-@app.get("/availableDomains")
-async def availableDomains():
-    results = list_of_available_domains()
-    return {"message":results}
+# @app.get("/availableDomains")
+# async def availableDomains():
+#     results = list_of_available_domains()
+#     return {"message":results}
 
-@app.get("/availableCategories")
-async def availableCategories():
-    results = list_of_available_category()
-    return {"message":results}
+# @app.get("/availableCategories")
+# async def availableCategories():
+#     results = list_of_available_category()
+#     return {"message":results}
 
-@app.post("/searchProductsOnDomainAndGPS")
-async def searchProductsOnDomainAndGPS(domain:str,product_name:str,latitude:str,longitude:str):
-    results = search_products_on_domain_and_gps(domain,product_name,latitude,longitude)
-    return {"message":results}
+# @app.post("/searchProductsOnDomainAndGPS")
+# async def searchProductsOnDomainAndGPS(domain:str,product_name:str,latitude:str,longitude:str):
+#     results = search_products_on_domain_and_gps(domain,product_name,latitude,longitude)
+#     return {"message":results}
 
-@app.post("/searchProductsOnDomainAndCategoryAndGPS")
-async def searchProductsOnDomainAndCategoryAndGPS(domain:str,category:str,product_name:str,latitude:str,longitude:str):
-    results = search_products_by_domain_category_and_gps(domain,category,product_name,latitude,longitude)
-    return {"message":results}
-@app.get("/searchSpacy/{text}")
-async def searchSpacy(text:str):
-    results = search_spacy(text)
-    return {"message":results}
+# @app.post("/searchProductsOnDomainAndCategoryAndGPS")
+# async def searchProductsOnDomainAndCategoryAndGPS(domain:str,category:str,product_name:str,latitude:str,longitude:str):
+#     results = search_products_by_domain_category_and_gps(domain,category,product_name,latitude,longitude)
+#     return {"message":results}
+# @app.get("/searchSpacy/{text}")
+# async def searchSpacy(text:str):
+#     results = search_spacy(text)
+#     return {"message":results}
