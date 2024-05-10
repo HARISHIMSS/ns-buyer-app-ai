@@ -4,19 +4,32 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration
 from langdetect import detect
 from spellchecker import SpellChecker
 
+from helpers.utils.data import getFlattenedDF
+
 model_id = "google/flan-t5-base"
 model = T5ForConditionalGeneration.from_pretrained(model_id)
 tokenizer = T5Tokenizer.from_pretrained(model_id)
 tokenizer, model
 
+spell = SpellChecker()
+df = getFlattenedDF()
+for itemName,providerName in zip(df["combined_item_name"].unique().tolist(),df["provider_name"].unique().tolist()):
+    itemNameArray = itemName.split()
+    providerNameArray = providerName.split()
+    spell.word_frequency.load_words(itemNameArray)
+    spell.known(itemNameArray)
+    spell.word_frequency.load_words(providerNameArray)
+    spell.known(providerNameArray)
 
 def correct_spelling(text):
-    spell = SpellChecker()
     corrected_tokens = [spell.correction(token) for token in text.split()]
     print("corrected_tokens",corrected_tokens)
-    if(corrected_tokens):
-        corrected_text = ' '.join(corrected_tokens)
-        return corrected_text
+    if any(element is not None for element in corrected_tokens):
+        if(corrected_tokens):
+            corrected_text = ' '.join(corrected_tokens)
+            return corrected_text
+        else:
+            return text
     else:
         return text
 

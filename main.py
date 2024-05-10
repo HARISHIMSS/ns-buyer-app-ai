@@ -1,7 +1,11 @@
-from fastapi import FastAPI, File, UploadFile
+from typing import Optional
+from fastapi import FastAPI, File, Form, UploadFile
+from pydantic import BaseModel
 from helpers.audio import transcribe_audio
-from helpers.search import full_text_search_transformer,search_by_gps, search_product_by_gps, search_seller_by_gps
+# from helpers.search import full_text_search_transformer,search_by_gps, search_product_by_gps, search_seller_by_gps
+# from helpers.s import full_text_search_tfidf
 from fastapi.responses import JSONResponse
+from helpers.search import full_text_search_tfidf
 from helpers.spacy.helpers import search_spacy
 from helpers.spacy.util import initialize_spacy
 from contextlib import asynccontextmanager
@@ -21,20 +25,70 @@ app = FastAPI(
 )
 
 
-@app.get("/")
-async def root():
-    return {"message":"NS-BUYER-APP-AI server is up and running..."}
+# @app.get("/")
+# async def root():
+#     return {"message":"NS-BUYER-APP-AI server is up and running..."}
+
+# @app.post("/transcribe-audio/")
+# async def transcribe_audio_endpoint(audio_file: UploadFile = File(...)):
+#     transcribed_text = transcribe_audio(audio_file)
+#     return {"transcribed_text":transcribed_text}
+
+# @app.post("/searchProductWithGPS")
+# async def searchProductWithGPS(product_name:str,latitude:str,longitude:str):
+#     results = search_product_by_gps(product_name, latitude, longitude)
+#     return {"message":results}
+# @app.post("/searchSellerWithGPS")
+# async def searchSellerWithGPS(seller_name:str,latitude:str,longitude:str):
+#     results = search_seller_by_gps(seller_name, latitude, longitude)
+#     return {"message":results}
+
+# @app.post("/searchByGPS")
+# async def searchByGPS(latitude:str,longitude:str):
+#     results = search_by_gps(latitude, longitude)
+#     return {"message":results}
+
+# @app.get("/searchInTransformer/{text}")
+# async def search(text:str):
+#     results = full_text_search_transformer(text)
+#     return {"message":results}
+
+@app.post("/audio_search")
+async def transcribe_audio_endpoint(audio_file: UploadFile = File(...),latitude: float = Form(...), longitude: float = Form(...), max_distance: Optional[float] = Form(5)):
+    transcribed_text = transcribe_audio(audio_file)
+    print("transcribed_text",transcribed_text)
+    if(transcribed_text):
+        results = full_text_search_tfidf(transcribed_text,latitude,longitude,max_distance)
+        return {"message":results}
+    return {"transcribed_text":transcribed_text}
+@app.post("/search")
+async def search(text:str,latitude:str,longitude:str,max_distance:int = 5):
+    results = full_text_search_tfidf(text,latitude,longitude,max_distance)
+    return {"message":results}
+
+@app.get("/searchSpacy/{text}")
+async def search(text:str):
+    results = search_spacy(text)
+    return {"message":results}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # @app.post("/searchText")
 # async def searchText(text:str,language_code:str = "en"):
 #     result = translate_and_correct(text,language_code)
 #     print("Translated and Corrected Output:", result)
 #     return {"refined Text":result}
-
-@app.post("/transcribe-audio/")
-async def transcribe_audio_endpoint(audio_file: UploadFile = File(...)):
-    transcribed_text = transcribe_audio(audio_file)
-    return {"transcribed_text":transcribed_text}
 
 # @app.post("/searchByDomain")
 # async def searchByDomain(domain:str,latitude:str,longitude:str):
@@ -45,30 +99,10 @@ async def transcribe_audio_endpoint(audio_file: UploadFile = File(...)):
 # async def searchByCategory(category:str,latitude:str,longitude:str):
 #     results = search_by_category(category,latitude,longitude)
 #     return {"message":results}
-
-@app.post("/searchProductWithGPS")
-async def searchProductWithGPS(product_name:str,latitude:str,longitude:str):
-    results = search_product_by_gps(product_name, latitude, longitude)
-    return {"message":results}
-@app.post("/searchSellerWithGPS")
-async def searchSellerWithGPS(seller_name:str,latitude:str,longitude:str):
-    results = search_seller_by_gps(seller_name, latitude, longitude)
-    return {"message":results}
-
-@app.post("/searchByGPS")
-async def searchByGPS(latitude:str,longitude:str):
-    results = search_by_gps(latitude, longitude)
-    return {"message":results}
-
 # @app.get("/searchInTFIDF/{text}")
 # async def searchInTFIDF(text:str):
 #     results = full_text_search_tfidf(text)
 #     return {"message":results}
-
-@app.get("/searchInTransformer/{text}")
-async def search(text:str):
-    results = full_text_search_transformer(text)
-    return {"message":results}
 # @app.get("/availableDomains")
 # async def availableDomains():
 #     results = list_of_available_domains()
