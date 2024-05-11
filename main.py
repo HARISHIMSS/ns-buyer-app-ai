@@ -1,14 +1,16 @@
 from imports import asynccontextmanager,File,FastAPI,Form,Optional,UploadFile
-from helpers import initialize_spacy,full_text_search_tfidf,search_spacy,transcribe_audio
+from helpers import full_text_search_tfidf,transcribe_audio
+from helpers.utils import trainData,search_spacy
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    initialize_spacy()
+    trainData()
     yield
 
 app = FastAPI(
     title="Buyer App AI APIs",
-    summary="Buyer app AI APIs",
+    summary="Buyer app AI APIs Summary",
+    description="Buyer app AI APIs Description",
     version="0.0.1",
     lifespan=lifespan
 )
@@ -35,6 +37,11 @@ async def search(text:str,latitude:str,longitude:str,max_distance:int = 5):
 async def search(text:str):
     results = search_spacy(text)
     return {"message":results}
+
+@app.get("/trainData")
+async def search():
+    trainData()
+    return {"message":"Latest Mongo data retrived and trained !"}
 
 
 

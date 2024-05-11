@@ -1,5 +1,4 @@
-from .models import audio2Text_model,audio2Text_processor,audio2Text_torch_dtype,torch_device,translation_model,translation_tokenizer,cudaIsAvailable
-from .spellChecker import spell
-
-__all__ = [audio2Text_model,audio2Text_processor,audio2Text_torch_dtype,torch_device,translation_model,translation_tokenizer,cudaIsAvailable]
-__all__ = [spell]
+from .models import audio2Text_model,audio2Text_processor,audio2Text_torch_dtype,torch_device,translation_model,translation_tokenizer,cudaIsAvailable,spacy_nlp,spacy_matcher,spell
+from .data import mongo_df,getMongoDF,updateMongoDF
+__all__ = [audio2Text_model,audio2Text_processor,audio2Text_torch_dtype,torch_device,translation_model,translation_tokenizer,cudaIsAvailable,spacy_nlp,spacy_matcher,spell]
+__all__ = [mongo_df,getMongoDF,updateMongoDF]

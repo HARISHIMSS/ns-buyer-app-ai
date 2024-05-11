@@ -1,10 +1,9 @@
 from imports import TfidfVectorizer,NearestNeighbors,linear_kernel,geodesic
 
-from helpers.spacy.helpers import search_spacy
-from helpers.utils import getFlattenedDF
+from helpers.utils import search_spacy
+from dependencies import getMongoDF
 
-df = getFlattenedDF()
-
+df = getMongoDF()
 
 # Create TF-IDF vectorizer for product names
 product_vectorizer = TfidfVectorizer(min_df=1)

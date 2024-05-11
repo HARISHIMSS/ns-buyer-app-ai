@@ -1,9 +1,8 @@
 from imports import np,torch,geodesic,NearestNeighbors
 from transformers import DistilBertTokenizer, DistilBertModel
+from dependencies import getMongoDF
 
-from helpers.utils.data import getFlattenedDF
-
-df = getFlattenedDF()
+df = getMongoDF()
 
 # Instantiate the tokenizer and model
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')

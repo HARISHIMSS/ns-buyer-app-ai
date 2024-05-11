@@ -1,5 +1,5 @@
 # from .. import AutoModelForSpeechSeq2Seq,AutoProcessor,pipeline,torch
-from imports import AutoModelForSpeechSeq2Seq,AutoProcessor,torch,T5ForConditionalGeneration,T5Tokenizer
+from imports import AutoModelForSpeechSeq2Seq,AutoProcessor,torch,T5ForConditionalGeneration,T5Tokenizer,spacy,Matcher,SpellChecker
 cudaIsAvailable = torch.cuda.is_available()
 print("Is cuda available", cudaIsAvailable)
 torch_device = "cuda:0" if cudaIsAvailable else "cpu"
@@ -19,3 +19,10 @@ translation_model = T5ForConditionalGeneration.from_pretrained(
 )
 translation_model.to(torch_device)
 translation_tokenizer = T5Tokenizer.from_pretrained(translation_model_id)
+
+spacy_model_id = "en_core_web_sm"
+spacy_nlp = spacy.load(spacy_model_id)
+spacy_matcher = Matcher(spacy_nlp.vocab)
+
+spell = SpellChecker()
+
