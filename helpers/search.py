@@ -1,12 +1,7 @@
-import numpy as np
-import torch
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.neighbors import NearestNeighbors
-from geopy.distance import geodesic
-from sklearn.metrics.pairwise import linear_kernel
+from imports import TfidfVectorizer,NearestNeighbors,linear_kernel,geodesic
 
 from helpers.spacy.helpers import search_spacy
-from helpers.utils.data import getFlattenedDF
+from helpers.utils import getFlattenedDF
 
 df = getFlattenedDF()
 

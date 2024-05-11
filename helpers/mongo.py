@@ -1,5 +1,4 @@
-from pymongo import MongoClient
-
+from imports import MongoClient
 # MongoDB connection settings
 MONGO_URI = "mongodb://localhost:27017"
 DATABASE_NAME = "bap_ce_db"

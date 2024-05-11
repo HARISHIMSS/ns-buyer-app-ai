@@ -1,33 +1,19 @@
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-import torch
-import os
-from tempfile import NamedTemporaryFile
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
-print("Is cuda available", torch.cuda.is_available())
-torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+from dependencies import audio2Text_model,audio2Text_processor,audio2Text_torch_dtype,torch_device
+from imports import pipeline,NamedTemporaryFile,os
 
-model_id = "openai/whisper-large-v3"
-
-model = AutoModelForSpeechSeq2Seq.from_pretrained(
-    model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
-)
-model.to(device)
-
-processor = AutoProcessor.from_pretrained(model_id)
-def transcribe_audio(audio_file):
-
-    pipe = pipeline(
+pipe = pipeline(
         "automatic-speech-recognition",
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
+        model=audio2Text_model,
+        tokenizer=audio2Text_processor.tokenizer,
+        feature_extractor=audio2Text_processor.feature_extractor,
         max_new_tokens=128,
         chunk_length_s=30,
         batch_size=16,
         return_timestamps=True,
-        torch_dtype=torch_dtype,
-        device=device
+        torch_dtype=audio2Text_torch_dtype,
+        device=torch_device
     )
+def transcribe_audio(audio_file):
     # Save the uploaded audio file to a temporary file
     with NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
         temp_audio.write(audio_file.file.read())

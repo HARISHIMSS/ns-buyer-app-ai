@@ -1,10 +1,7 @@
-import spacy
-import re
+
 from helpers.text import translate_and_correct
 from helpers.utils.data import getFlattenedDF
-from spacy.matcher import Matcher
-from spacy.tokens import Span
-import pandas as pd
+from imports import Matcher,Span,spacy,re
 
 df = getFlattenedDF()
 # Load a spaCy language model

@@ -1,16 +1,5 @@
-from typing import Optional
-from fastapi import FastAPI, File, Form, UploadFile
-from pydantic import BaseModel
-from helpers.audio import transcribe_audio
-# from helpers.search import full_text_search_transformer,search_by_gps, search_product_by_gps, search_seller_by_gps
-# from helpers.s import full_text_search_tfidf
-from fastapi.responses import JSONResponse
-from helpers.search import full_text_search_tfidf
-from helpers.spacy.helpers import search_spacy
-from helpers.spacy.util import initialize_spacy
-from contextlib import asynccontextmanager
-
-from helpers.text import translate_and_correct
+from imports import asynccontextmanager,File,FastAPI,Form,Optional,UploadFile
+from helpers import initialize_spacy,full_text_search_tfidf,search_spacy,transcribe_audio
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
@@ -25,33 +14,9 @@ app = FastAPI(
 )
 
 
-# @app.get("/")
-# async def root():
-#     return {"message":"NS-BUYER-APP-AI server is up and running..."}
-
-# @app.post("/transcribe-audio/")
-# async def transcribe_audio_endpoint(audio_file: UploadFile = File(...)):
-#     transcribed_text = transcribe_audio(audio_file)
-#     return {"transcribed_text":transcribed_text}
-
-# @app.post("/searchProductWithGPS")
-# async def searchProductWithGPS(product_name:str,latitude:str,longitude:str):
-#     results = search_product_by_gps(product_name, latitude, longitude)
-#     return {"message":results}
-# @app.post("/searchSellerWithGPS")
-# async def searchSellerWithGPS(seller_name:str,latitude:str,longitude:str):
-#     results = search_seller_by_gps(seller_name, latitude, longitude)
-#     return {"message":results}
-
-# @app.post("/searchByGPS")
-# async def searchByGPS(latitude:str,longitude:str):
-#     results = search_by_gps(latitude, longitude)
-#     return {"message":results}
-
-# @app.get("/searchInTransformer/{text}")
-# async def search(text:str):
-#     results = full_text_search_transformer(text)
-#     return {"message":results}
+@app.get("/")
+async def root():
+    return {"message":"NS-BUYER-APP-AI server is up and running..."}
 
 @app.post("/audio_search")
 async def transcribe_audio_endpoint(audio_file: UploadFile = File(...),latitude: float = Form(...), longitude: float = Form(...), max_distance: Optional[float] = Form(5)):

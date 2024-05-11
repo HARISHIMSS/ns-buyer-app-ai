@@ -1,5 +1,5 @@
 from helpers.mongo import getDataFromDB
-import pandas as pd
+from imports import pd
 
 data = getDataFromDB()
 keys,values = data["keys"],data["values"]

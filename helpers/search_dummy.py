@@ -1,8 +1,5 @@
-import numpy as np
-import torch
+from imports import np,torch,geodesic,NearestNeighbors
 from transformers import DistilBertTokenizer, DistilBertModel
-from sklearn.neighbors import NearestNeighbors
-from geopy.distance import geodesic
 
 from helpers.utils.data import getFlattenedDF
 
