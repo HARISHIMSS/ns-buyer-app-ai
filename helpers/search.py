@@ -1,4 +1,4 @@
-from imports import TfidfVectorizer,NearestNeighbors,linear_kernel,geodesic
+from imports import TfidfVectorizer,NearestNeighbors,linear_kernel,geodesic,pd
 
 from helpers.utils import search_spacy
 from dependencies import getMongoDF
@@ -25,7 +25,7 @@ def full_text_search_tfidf(query,latitude,longitude,max_distance_km):
     print("spacyResults",spacyResults)
     productsArray = spacyResults["items"]
     providersArray = spacyResults["providers"]
-    combined_results = []
+    combined_results = pd.DataFrame()
     if len(productsArray) > 0:
         # Perform full text search for product names
         for product_query in productsArray:
@@ -39,7 +39,7 @@ def full_text_search_tfidf(query,latitude,longitude,max_distance_km):
             results = df.iloc[related_indices].copy()  # Copy the DataFrame to avoid modifying the original one
             results['distance'] = results.apply(lambda row: geodesic((latitude, longitude), tuple(map(float, [row['provider_location'][1], row['provider_location'][0]]))).km, axis=1)
             results = results[results['distance'] <= max_distance_km]
-            combined_results.extend(results.to_dict('records'))
+            combined_results = pd.concat([combined_results, results]) 
     if len(providersArray) > 0:
         # Perform full text search for seller names
         for seller_query in providersArray:
@@ -49,5 +49,9 @@ def full_text_search_tfidf(query,latitude,longitude,max_distance_km):
             results = df.iloc[related_indices].copy()  # Copy the DataFrame to avoid modifying the original one
             results['distance'] = results.apply(lambda row: geodesic((latitude, longitude), tuple(map(float, [row['provider_location'][1], row['provider_location'][0]]))).km, axis=1)
             results = results[results['distance'] <= max_distance_km]
-            combined_results.extend(results.to_dict('records'))
+            combined_results = pd.concat([combined_results, results]) 
+    # Remove duplicates and group by _id
+    if not combined_results.empty:
+        combined_results = combined_results.drop_duplicates(subset='_id').groupby('domain').apply(lambda x: x.to_dict('records')).to_dict()
+
     return combined_results
