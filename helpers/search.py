@@ -20,8 +20,8 @@ tfidf_nn_model_product.fit(product_embeddings)
 tfidf_nn_model_seller = NearestNeighbors(n_neighbors=None, metric="cosine")
 tfidf_nn_model_seller.fit(seller_embeddings)
 
-def full_text_search_tfidf(query,latitude,longitude,max_distance_km):
-    spacyResults = search_spacy(query)
+def full_text_search_tfidf(query,latitude,longitude,max_distance_km,input_language:str="en"):
+    spacyResults = search_spacy(query,input_language)
     print("spacyResults",spacyResults)
     productsArray = spacyResults["items"]
     providersArray = spacyResults["providers"]
@@ -52,6 +52,8 @@ def full_text_search_tfidf(query,latitude,longitude,max_distance_km):
             combined_results = pd.concat([combined_results, results]) 
     # Remove duplicates and group by _id
     if not combined_results.empty:
+        print("ifffffff")
         combined_results = combined_results.drop_duplicates(subset='_id').groupby('domain').apply(lambda x: x.to_dict('records')).to_dict()
-
-    return combined_results
+        return combined_results
+    else:
+        return {"message":"No Data Found"}

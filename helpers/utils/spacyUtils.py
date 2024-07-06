@@ -4,8 +4,8 @@ from imports import Span,spacy,re
 from dependencies import spacy_matcher, spacy_nlp,getMongoDF
 
 # Function to process user query
-def process_query(text):
-    text = translate_and_correct(text)
+def process_query(text,input_language:str="en"):
+    text = translate_and_correct(text,input_language)
     doc = spacy_nlp(text.lower())
     matches = spacy_matcher(doc)
     entities = list(doc.ents)
@@ -43,8 +43,8 @@ def initialize_spacy():
             productArray.append(lower_pattern)
         spacy_matcher.add("ITEM", productArray)
 
-def search_spacy(text):
-     result = process_query(text)
+def search_spacy(text,input_language):
+     result = process_query(text,input_language)
      providers = [ent.text for ent in result.ents if ent.label_ == "PROVIDER"]
      items = [ent.text for ent in result.ents if ent.label_ == "ITEM"]
      return {"providers":providers,"items":items}

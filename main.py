@@ -29,8 +29,8 @@ async def transcribe_audio_endpoint(audio_file: UploadFile = File(...),latitude:
         return {"message":results}
     return {"transcribed_text":transcribed_text}
 @app.post("/search")
-async def search(text:str,latitude:str,longitude:str,max_distance:int = 5):
-    results = full_text_search_tfidf(text,latitude,longitude,max_distance)
+async def search(text:str,latitude:str,longitude:str,max_distance:int = 5,input_language:str = "en"):
+    results = full_text_search_tfidf(text,latitude,longitude,max_distance,input_language)
     return {"message":results}
 
 @app.get("/searchSpacy/{text}")

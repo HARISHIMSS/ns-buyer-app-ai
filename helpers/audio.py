@@ -23,6 +23,7 @@ def transcribe_audio(audio_file):
         # Transcribe audio using the specified model
         result = pipe(temp_audio_path,generate_kwargs={"task":"translate"})
         transcription = result["text"]
+        print("Transcription",transcription)
         return transcription
     finally:
         # Remove the temporary audio file

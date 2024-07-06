@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline,T5Tokenizer, T5ForConditionalGeneration
+from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline,T5Tokenizer, T5ForConditionalGeneration,M2M100ForConditionalGeneration, M2M100Tokenizer
 from typing import Optional
 from fastapi import FastAPI, File, Form, UploadFile
 from contextlib import asynccontextmanager
@@ -19,7 +19,7 @@ from spacy.tokens import Span
 import numpy as np
 
 __all__ = [torch]
-__all__ = [AutoModelForSpeechSeq2Seq,AutoProcessor,pipeline,T5Tokenizer, T5ForConditionalGeneration]
+__all__ = [AutoModelForSpeechSeq2Seq,AutoProcessor,pipeline,T5Tokenizer, T5ForConditionalGeneration,M2M100ForConditionalGeneration, M2M100Tokenizer]
 __all__ = [Optional]
 __all__ = [FastAPI, File, Form, UploadFile]
 __all__ = [asynccontextmanager]
